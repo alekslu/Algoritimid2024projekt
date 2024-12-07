@@ -1,1 +1,1 @@
-# Algoritimid2024projekt
+pip install openpyxl
