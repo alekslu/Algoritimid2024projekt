@@ -1,25 +1,24 @@
 import tkinter as tk
 from tkinter import messagebox
 from openpyxl import Workbook, load_workbook
-from search_algorithms import lineaarotsing, binaarotsing
-from inventory_manager import dataPath
+from otsingualgoritmid import lineaarotsing, binaarotsing
+from backend import exceliPath
 import os
 
-class InventoryApp:
+class LaohaldusRakendus:
     def __init__(self, root):
         self.root = root
-        self.root.title("Inventory Management System")
-        self.root.geometry("800x600")  # Set the window size to be larger (800x600)
+        self.root.title("Laohaldus")
+        self.root.geometry("500x500") 
 
         # Load inventory from Excel file
         self.inventory = self.load_inventory_from_excel()
 
-        # Create otsi options
         self.otsi_algorithm = tk.StringVar(value="unselected")
 
-        self.create_widgets()
+        self.loo_kasutajaliides()
 
-    def create_widgets(self):
+    def loo_kasutajaliides(self):
         self.toote_nimetus_label = tk.Label(self.root, text="Tootenimetus:")
         self.toote_nimetus_label.grid(row=0, column=0)
         self.toote_nimetus_entry = tk.Entry(self.root)
@@ -77,12 +76,10 @@ class InventoryApp:
         # Configure Scrollbar
         self.table_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=9, column=3, sticky="ns")
-        self.table_canvas.grid(row=9, column=0, columnspan=3, sticky="nsew")
+        self.table_canvas.grid(row=9, column=0, columnspan=3)
         
-        # Create a window inside the canvas to hold the table frame
+        # scroll
         self.table_window = self.table_canvas.create_window((0, 0), window=self.table_scroll_frame, anchor="nw")
-
-        # Bind events to update the canvas size
         self.table_scroll_frame.bind("<Configure>", lambda e: self.table_canvas.configure(scrollregion=self.table_canvas.bbox("all")))
 
         self.refresh_table()
@@ -93,12 +90,12 @@ class InventoryApp:
         toote_kogus = self.toote_kogus_entry.get()
         toote_hind = self.toote_hind_entry.get()
 
-        # Validate entries
+        # Uue toote lisamise valideerimine frontendis
         if not toote_nimetus or not toote_kategooria or not toote_kogus or not toote_hind:
             messagebox.showerror("VIGA!", "Kõik väljad peavad olema täidetud!")
             return
 
-        # lisa toode to inventory
+        # Lisatava toote andmed
         toode = {
             "nimetus": toote_nimetus,
             "kategooria": toote_kategooria,
@@ -107,7 +104,7 @@ class InventoryApp:
         }
         self.inventory.append(toode)
 
-        # Clear the entry fields
+        # Puhasta väljad kui toode lisatud
         self.toote_nimetus_entry.delete(0, tk.END)
         self.toote_kategooria_entry.delete(0, tk.END)
         self.toote_kogus_entry.delete(0, tk.END)
@@ -115,33 +112,33 @@ class InventoryApp:
 
         self.refresh_table()
 
-        # Save updated inventory to Excel
+        # Salvesta excelisse
         self.save_inventory_to_excel()
 
         messagebox.showinfo("Lisamine õnnestus", f"'{toote_nimetus}' lisatud baasi")
 
     def refresh_table(self, inventory=None):
-        # Clear previous table contents
+        # Puhasta tabel
         for widget in self.table_scroll_frame.winfo_children():
             widget.destroy()
 
         # Use the full inventory if no filtered list is provided
         inventory = inventory or self.inventory
 
-        # Table headers
+        # Päis
         headers = ["Nimetus", "Kategooria", "Kogus", "Hind"]
         for col, header in enumerate(headers):
             header_label = tk.Label(self.table_scroll_frame, text=header, font=('Arial', 10, 'bold'))
             header_label.grid(row=0, column=col, padx=5, pady=5)
 
-        # Populate the table with tooted
+        # Tabeli täitmine andmetega
         for row, toode in enumerate(inventory, start=1):
             tk.Label(self.table_scroll_frame, text=toode['nimetus']).grid(row=row, column=0, padx=5, pady=5)
             tk.Label(self.table_scroll_frame, text=toode['kategooria']).grid(row=row, column=1, padx=5, pady=5)
             tk.Label(self.table_scroll_frame, text=toode['kogus']).grid(row=row, column=2, padx=5, pady=5)
             tk.Label(self.table_scroll_frame, text=f"{toode['hind']:,.2f} €").grid(row=row, column=3, padx=5, pady=5)
 
-            # eemalda toode button for each row
+            # eemalda toode nupp igale tootele
             eemalda_button = tk.Button(self.table_scroll_frame, text="EEMALDA", command=lambda i=toode: self.eemalda_toode(i))
             eemalda_button.grid(row=row, column=4, padx=5, pady=5)
 
@@ -185,7 +182,7 @@ class InventoryApp:
 
 
     def load_inventory_from_excel(self):
-        file_nimetus = dataPath
+        file_nimetus = exceliPath
         if not os.path.exists(file_nimetus):
             return []  # Return empty list if file doesn't exist
 
@@ -204,7 +201,7 @@ class InventoryApp:
         return inventory
 
     def save_inventory_to_excel(self):
-        file_nimetus = dataPath
+        file_nimetus = exceliPath
         workbook = Workbook()
         sheet = workbook.active
 
@@ -219,5 +216,5 @@ class InventoryApp:
 
 
 root = tk.Tk()
-app = InventoryApp(root)
+app = LaohaldusRakendus(root)
 root.mainloop()

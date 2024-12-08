@@ -4,11 +4,11 @@ import os, json
 with open("config.json", "r") as file:
     config = json.load(file)
 
-#dataPath = config["dataFilePath"]
-dataPath = config["testDataFilePath"]
+#exceliPath = config["dataFilePath"]
+exceliPath = config["testDataFilePath"]
 
 class InventoryManager:
-    def __init__(self, file_nimetus=dataPath):
+    def __init__(self, file_nimetus=exceliPath):
         self.inventory = []  # List to store inventory tooted
         self.next_id = 1  # ID counter for new tooted
         self.file_nimetus = file_nimetus  # Excel file nimetus
