@@ -4,6 +4,8 @@ from openpyxl import Workbook, load_workbook
 from otsingualgoritmid import lineaarotsing, binaarotsing
 from backend import exceliPath
 import os
+import re
+import time
 
 class LaohaldusRakendus:
     def __init__(self, root):
@@ -184,6 +186,8 @@ class LaohaldusRakendus:
             messagebox.showerror("VIGA!", "Sisesta otsingusõna!")
             return
 
+        start_time = time.time()  # Alguse aja salvestamine
+
         # Perform otsi based on selected algorithm
         if self.otsi_algorithm.get() == "Linear":
             index = lineaarotsing(self.inventory, otsi_term)
@@ -195,14 +199,17 @@ class LaohaldusRakendus:
             messagebox.showerror("VIGA!", "Otsingualgoritm peab olema valitud!")
             return
 
+        end_time = time.time()  # Lõpu aja salvestamine
+        duration = (end_time - start_time) * 1000  # Ajakulu millisekundites
+
         # If otsi term is found, create a filtered list
         if index != -1:
             matched_toode = self.inventory[index]
             filtered_inventory = [matched_toode]
-            self.results_label.config(text=f"Leitud: {matched_toode['nimetus']} - {matched_toode['kategooria']} - {matched_toode['kogus']} tk - {matched_toode['hind']} €")
+            self.results_label.config(text=f"Leitud: {matched_toode['nimetus']} - {matched_toode['kategooria']} - {matched_toode['kogus']} tk - {matched_toode['hind']} €\n"f"Ajakulu: {duration:.2f} ms")
         else:
             filtered_inventory = []  # No match
-            self.results_label.config(text="Toodet ei leitud!")
+            self.results_label.config(text="Toodet ei leitud!\nAjakulu: {duration:.2f} ms")
 
         # Refresh the table to show only the otsi results
         self.refresh_table(filtered_inventory)
@@ -249,7 +256,12 @@ class LaohaldusRakendus:
 
         # Rakendame sortimise
         if key in ["nimetus", "kategooria"]:  # Tähestikulised veerud
-            self.inventory.sort(key=lambda x: x[key].lower(), reverse=descending)
+            if key == "nimetus":
+                # Sortimine numbriliselt, kui tootenimedes on numbrid
+                self.inventory.sort(key=lambda x: [int(i) if i.isdigit() else i.lower() for i in re.split(r'(\d+)', x[key])], reverse=descending)
+            else:
+                # Tavaline sortimine kategooria järgi
+                self.inventory.sort(key=lambda x: x[key].lower(), reverse=descending)
         elif key in ["kogus", "hind"]:  # Numbrilised veerud
             self.inventory.sort(key=lambda x: x[key], reverse=descending)
         else:
