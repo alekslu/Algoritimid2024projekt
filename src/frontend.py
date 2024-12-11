@@ -248,9 +248,9 @@ class LaohaldusRakendus:
 
         workbook.save(file_nimetus)
 
-    # Sordib inventory kindla võtme järgi ja värskendab tabeli. Sortimine käib seljuhul valikuliselt 'nimetus', 'kategooria', 'kogus' ja 'hind' järgi.
+    # Sordib inventory kindla võtme järgi ja värskendab tabeli. Sortimine käib seljuhul valikuliselt 'nimetus', 'kategooria' või 'hind' järgi.
     def sordi_inventory(self, key):
-        # Sorteerimise suuna vahetamine
+        # Sorteerimise suuna vahetamine, nupul klikides sorteeritakse loend kahanevas järjestuses ja uuesti klikkides kasvavas järejestuses
         self.sort_directions[key] = not self.sort_directions[key]
         descending = self.sort_directions[key]
 
