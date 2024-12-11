@@ -9,12 +9,20 @@ class LaohaldusRakendus:
     def __init__(self, root):
         self.root = root
         self.root.title("Laohaldus")
-        self.root.geometry("500x500") 
+        self.root.geometry("490x505")
 
         # Load inventory from Excel file
         self.inventory = self.load_inventory_from_excel()
 
         self.otsi_algorithm = tk.StringVar(value="unselected")
+
+        # Sorteerimise suuna jälgimine igale veerule
+        self.sort_directions = {
+            "nimetus": False,  # False = kasvav, True = kahanev
+            "kategooria": False,
+            "kogus": False,
+            "hind": False
+        }
 
         self.loo_kasutajaliides()
 
@@ -40,9 +48,25 @@ class LaohaldusRakendus:
         self.toote_hind_entry = tk.Entry(self.root)
         self.toote_hind_entry.grid(row=3, column=1)
 
+        # Sortimisvalikud
+        self.sort_nimetus_button = tk.Button(self.root, text="Sordi nimetuse järgi", command=lambda: self.sordi_inventory("nimetus"))
+        self.sort_kategooria_button = tk.Button(self.root, text="Sordi kategooria järgi", command=lambda: self.sordi_inventory("kategooria"))
+        self.sort_kogus_button = tk.Button(self.root, text="Sordi koguse järgi", command=lambda: self.sordi_inventory("kogus"))
+        self.sort_hind_button = tk.Button(self.root, text="Sordi hinna järgi", command=lambda: self.sordi_inventory("hind"))
+
+        # Sortimisnuppude paigutused
+        self.sort_nimetus_button.grid(row=10, column=0, padx=5, pady=5)
+        self.sort_kategooria_button.grid(row=10, column=1, padx=5, pady=5)
+        self.sort_kogus_button.grid(row=10, column=2, padx=5, pady=5)
+        self.sort_hind_button.grid(row=10, column=3, padx=5, pady=5)
+
         # lisa toode Button
         self.lisa_toode_button = tk.Button(self.root, text="LISA TOODE", command=self.lisa_toode)
         self.lisa_toode_button.grid(row=4, column=0, columnspan=2)
+
+        # Värskenda Button, algse täisvaate taastamiseks
+        self.varskenda_button = tk.Button(self.root, text="VÄRSKENDA", command=self.varskenda_tabel)
+        self.varskenda_button.grid(row=7, column=1, columnspan=2)
 
         # otsi Label and Entry
         self.otsi_label = tk.Label(self.root, text="OTSI toodet:")
@@ -77,7 +101,7 @@ class LaohaldusRakendus:
         self.table_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=9, column=3, sticky="ns")
         self.table_canvas.grid(row=9, column=0, columnspan=3)
-        
+
         # scroll
         self.table_window = self.table_canvas.create_window((0, 0), window=self.table_scroll_frame, anchor="nw")
         self.table_scroll_frame.bind("<Configure>", lambda e: self.table_canvas.configure(scrollregion=self.table_canvas.bbox("all")))
@@ -142,7 +166,10 @@ class LaohaldusRakendus:
             eemalda_button = tk.Button(self.table_scroll_frame, text="EEMALDA", command=lambda i=toode: self.eemalda_toode(i))
             eemalda_button.grid(row=row, column=4, padx=5, pady=5)
 
-
+    #Taastab tabeli algse, täisvaate.
+    def varskenda_tabel(self):
+        self.results_label.config(text="Otsingutulemus: -")
+        self.refresh_table()
 
     def eemalda_toode(self, toode):
         self.inventory = [i for i in self.inventory if i != toode]  # eemaldas the selected toode
@@ -214,6 +241,22 @@ class LaohaldusRakendus:
 
         workbook.save(file_nimetus)
 
+    # Sordib inventory kindla võtme järgi ja värskendab tabeli. Sortimine käib seljuhul valikuliselt 'nimetus', 'kategooria', 'kogus' ja 'hind' järgi.
+    def sordi_inventory(self, key):
+        # Sorteerimise suuna vahetamine
+        self.sort_directions[key] = not self.sort_directions[key]
+        descending = self.sort_directions[key]
+
+        # Rakendame sortimise
+        if key in ["nimetus", "kategooria"]:  # Tähestikulised veerud
+            self.inventory.sort(key=lambda x: x[key].lower(), reverse=descending)
+        elif key in ["kogus", "hind"]:  # Numbrilised veerud
+            self.inventory.sort(key=lambda x: x[key], reverse=descending)
+        else:
+            return
+
+        # Värskendab tabeli sorteeritud inventuuriga
+        self.refresh_table()
 
 root = tk.Tk()
 app = LaohaldusRakendus(root)
