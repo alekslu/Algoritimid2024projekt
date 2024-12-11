@@ -18,5 +18,3 @@ def binaarotsing(data, otsi_term):
         else:
             high = mid - 1
     return -1
-
-#TODO:: näidis sellest kui data on by nimetus sorted otsing ja siis kui ei ole.. ajaline vahe

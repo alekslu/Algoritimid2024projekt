@@ -4,18 +4,17 @@ import os, json
 with open("config.json", "r") as file:
     config = json.load(file)
 
-#exceliPath = config["dataFilePath"]
-exceliPath = config["testDataFilePath"]
+exceliPath = config["dataFilePath"]
+#exceliPath = config["testDataFilePath"]
 
 class InventoryManager:
     def __init__(self, file_nimetus=exceliPath):
-        self.inventory = []  # List to store inventory tooted
-        self.next_id = 1  # ID counter for new tooted
-        self.file_nimetus = file_nimetus  # Excel file nimetus
-        self.load_inventory()  # Load inventory from file if it exists
+        self.inventory = []  # List laohalduse toodete jaoks
+        self.next_id = 1  # Id loendur toodete jaoks
+        self.file_nimetus = file_nimetus  # Exceli fail
+        #self.load_inventory()  # Lae excel
 
     def lisa_toode(self, nimetus, kategooria, kogus, hind):
-        """lisa a new toode to the inventory."""
         toode = {
             "id": self.next_id,
             "nimetus": nimetus,
@@ -25,12 +24,12 @@ class InventoryManager:
         }
         self.inventory.append(toode)
         self.next_id += 1
-        self.save_inventory()  # Save the updated inventory to the Excel file
+        self.save_inventory() 
         return toode
 
     def eemalda_toode(self, toote_id):
         self.inventory = [toode for toode in self.inventory if toode["id"] != toote_id]
-        self.save_inventory()  # Save the updated inventory to the Excel file
+        self.save_inventory() 
 
     def otsi_tooted(self, **criteria):
         results = self.inventory
@@ -56,13 +55,13 @@ class InventoryManager:
         # Salvesta
         wb.save(self.file_nimetus)
 
+    # SEDA VIST POLE ENAM VAJA
     def load_inventory(self):
-        """Load inventory from an Excel file if it exists."""
         if os.path.exists(self.file_nimetus):
             wb = load_workbook(self.file_nimetus)
             ws = wb.active
 
-            # Clear existing inventory
+            # Puhasta olemasolev list
             self.inventory = []
 
             # Andmete lugemine ridadelt, headerit ei loeta
