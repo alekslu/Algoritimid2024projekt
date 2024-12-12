@@ -4,15 +4,15 @@ import os, json
 with open("config.json", "r") as file:
     config = json.load(file)
 
-exceliPath = config["dataFilePath"]
-#exceliPath = config["testDataFilePath"]
+#exceliPath = config["dataFilePath"]
+exceliPath = config["testDataFilePath"]
 
 class InventoryManager:
     def __init__(self, file_nimetus=exceliPath):
         self.inventory = []  # List laohalduse toodete jaoks
         self.next_id = 1  # Id loendur toodete jaoks
         self.file_nimetus = file_nimetus  # Exceli fail
-        #self.load_inventory()  # Lae excel
+        self.load_inventory()  # Lae excel
 
     def lisa_toode(self, nimetus, kategooria, kogus, hind):
         toode = {

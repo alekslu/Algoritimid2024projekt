@@ -3,9 +3,7 @@ from tkinter import messagebox
 from openpyxl import Workbook, load_workbook
 from otsingualgoritmid import lineaarotsing, binaarotsing
 from backend import exceliPath
-import os
-import re
-import time
+import os, re, time
 
 class LaohaldusRakendus:
     def __init__(self, root):
@@ -185,11 +183,10 @@ class LaohaldusRakendus:
 
         start_time = time.time()  # Alguse aja salvestamine
 
-        # Perform otsi based on selected algorithm
         if self.otsi_algorithm.get() == "Linear":
             index = lineaarotsing(self.inventory, otsi_term)
         elif self.otsi_algorithm.get() == "Binary":
-            # Binary otsi requires data to be sorted first
+            # Binaarotsingu jaoks on oluline, et otsitav väärtus on sorteeritud
             self.inventory.sort(key=lambda x: x['nimetus'].lower())
             index = binaarotsing(self.inventory, otsi_term)
         else:
@@ -206,7 +203,7 @@ class LaohaldusRakendus:
             self.results_label.config(text=f"Leitud: {matched_toode['nimetus']} - {matched_toode['kategooria']} - {matched_toode['kogus']} tk - {matched_toode['hind']} €\n"f"Ajakulu: {duration:.2f} ms")
         else:
             filtered_inventory = []  # Ei leitud vastet
-            self.results_label.config(text="Toodet ei leitud!\nAjakulu: {duration:.2f} ms")
+            self.results_label.config(text="Toodet ei leitud!\n"f"Ajakulu: {duration:.2f} ms")
 
         # Värskenda tabelit, et kuvada ainult otsitud väärtuseid
         self.refresh_table(filtered_inventory)

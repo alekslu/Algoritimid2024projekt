@@ -7,7 +7,6 @@ def lineaarotsing(data, otsi_term): # sisenditeks on data ja otsingusõna
     return -1
 
 def binaarotsing(data, otsi_term):
-    """Binary otsi algorithm (assumes data is sorted by 'nimetus')"""
     low, high = 0, len(data) - 1
     while low <= high:
         mid = (low + high) // 2
