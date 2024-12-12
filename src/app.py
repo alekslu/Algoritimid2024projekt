@@ -7,8 +7,9 @@ import os, re, time, json
 with open("config.json", "r") as file:
     config = json.load(file)
 
-#exceliPath = config["dataFilePath"]
-exceliPath = config["testDataFilePath"]
+exceliPath = config["dataFilePath"]
+#exceliPath = config["testDataFilePath"]
+#exceliPath = config["csvTest"]
 
 class LaohaldusRakendus:
     def __init__(self, root):

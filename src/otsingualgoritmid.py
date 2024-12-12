@@ -1,4 +1,3 @@
-# otsi_algorithms.py
 
 def lineaarotsing(data, otsi_term): # sisenditeks on data ja otsingusõna
     for index, toode in enumerate(data): # käiakse läbi kõik indeksid ja tooted, enumerate aitab indeksitega järge pidada, ei pea manuaalselt seda osa koodis lahti kirjutama
