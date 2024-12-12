@@ -2,8 +2,13 @@ import tkinter as tk
 from tkinter import messagebox
 from openpyxl import Workbook, load_workbook
 from otsingualgoritmid import lineaarotsing, binaarotsing
-from backend import exceliPath
-import os, re, time
+import os, re, time, json
+
+with open("config.json", "r") as file:
+    config = json.load(file)
+
+#exceliPath = config["dataFilePath"]
+exceliPath = config["testDataFilePath"]
 
 class LaohaldusRakendus:
     def __init__(self, root):
@@ -91,19 +96,17 @@ class LaohaldusRakendus:
         self.table_frame = tk.Frame(self.root)
         self.table_frame.grid(row=9, column=0, columnspan=3)
 
-         # Scrollable Frame for Inventory Table
         self.table_canvas = tk.Canvas(self.root)
         self.scrollbar = tk.Scrollbar(self.root, orient="vertical", command=self.table_canvas.yview)
         self.table_scroll_frame = tk.Frame(self.table_canvas)
 
-        # Configure Scrollbar
         self.table_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=9, column=3, sticky="ns")
         self.table_canvas.grid(row=9, column=0, columnspan=3)
         self.table_window = self.table_canvas.create_window((0, 0), window=self.table_scroll_frame, anchor="nw")
         self.table_scroll_frame.bind("<Configure>", lambda e: self.table_canvas.configure(scrollregion=self.table_canvas.bbox("all")))
 
-        self.refresh_table()
+        self.v2rskenda_tabel()
 
     def lisa_toode(self):
         toote_nimetus = self.toote_nimetus_entry.get()
@@ -131,14 +134,14 @@ class LaohaldusRakendus:
         self.toote_kogus_entry.delete(0, tk.END)
         self.toote_hind_entry.delete(0, tk.END)
 
-        self.refresh_table()
+        self.v2rskenda_tabel()
 
         # Salvesta excelisse
         self.save_inventory_to_excel()
 
         messagebox.showinfo("Lisamine õnnestus", f"'{toote_nimetus}' lisatud baasi")
 
-    def refresh_table(self, inventory=None):
+    def v2rskenda_tabel(self, inventory=None):
         # Puhasta tabel
         for widget in self.table_scroll_frame.winfo_children():
             widget.destroy()
@@ -166,11 +169,11 @@ class LaohaldusRakendus:
     #Taastab tabeli algse, täisvaate.
     def varskenda_tabel(self):
         self.results_label.config(text="Otsingutulemus: -")
-        self.refresh_table()
+        self.v2rskenda_tabel()
 
     def eemalda_toode(self, toode):
         self.inventory = [i for i in self.inventory if i != toode]  # eemaldas the selected toode
-        self.refresh_table()
+        self.v2rskenda_tabel()
 
         # Save updated inventory to Excel
         self.save_inventory_to_excel()
@@ -206,7 +209,7 @@ class LaohaldusRakendus:
             self.results_label.config(text="Toodet ei leitud!\n"f"Ajakulu: {duration:.2f} ms")
 
         # Värskenda tabelit, et kuvada ainult otsitud väärtuseid
-        self.refresh_table(filtered_inventory)
+        self.v2rskenda_tabel(filtered_inventory)
 
 
     def load_inventory_from_excel(self):
@@ -262,7 +265,7 @@ class LaohaldusRakendus:
             return
 
         # Värskendab tabeli sorteeritud inventuuriga
-        self.refresh_table()
+        self.v2rskenda_tabel()
 
 root = tk.Tk()
 app = LaohaldusRakendus(root)
